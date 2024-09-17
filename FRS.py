@@ -3,120 +3,84 @@ import face_recognition
 import numpy as np
 import pickle
 import os
-from flask import Flask, render_template_string, jsonify
-import threading
-
-app = Flask(__name__)
-
-recognized_faces = []
+from tkinter import *
+from tkinter import simpledialog, messagebox
+from PIL import Image, ImageTk
 
 if os.path.exists("registered_faces.pkl"):
     with open("registered_faces.pkl", "rb") as f:
         registered_faces = pickle.load(f)
-
-    for name, info in registered_faces.items():
-        if 'encoding' in info:
-            registered_faces[name]['encodings'] = [info['encoding']]
-            del registered_faces[name]['encoding']
 else:
     registered_faces = {}
 
-def register_new_face(encoding):
-    name = input("Enter your name: ")
-    details = input(f"Enter details for {name}: ")
-    registered_faces[name] = {"encodings": [encoding], "details": details}
-    with open("registered_faces.pkl", "wb") as f:
-        pickle.dump(registered_faces, f)
-    print(f"New face registered for {name} with details: {details}")
+tolerance = 0.5  
 
-@app.route('/')
-def index():
-    global recognized_faces
-    html = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Face Recognition Web Server</title>
-    </head>
-    <body>
-        <h1>Recognized Faces</h1>
-        <div id="faces">
-        {% for face in faces %}
-            <p>{{ face }}</p>
-        {% endfor %}
-        </div>
-        <script>
-        setInterval(function() {
-            fetch('/faces').then(response => response.json()).then(data => {
-                const facesDiv = document.getElementById('faces');
-                facesDiv.innerHTML = '';
-                data.faces.forEach(face => {
-                    const p = document.createElement('p');
-                    p.textContent = face;
-                    facesDiv.appendChild(p);
-                });
-            });
-        }, 1000);
-        </script>
-    </body>
-    </html>
-    """
-    return render_template_string(html, faces=recognized_faces)
+class FaceRecognitionApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Face Recognition App")
 
-@app.route('/faces')
-def get_faces():
-    return jsonify(faces=recognized_faces)
+        self.video_frame = Label(self.root)
+        self.video_frame.pack(padx=10, pady=10)
 
-def recognize_faces():
-    global recognized_faces
-    video_capture = cv2.VideoCapture(0)
+        self.face_label = Label(self.root, text="Face: None", font=("Arial", 14))
+        self.face_label.pack(pady=10)
 
-    TOLERANCE = 0.5  
-    NUM_JITTERS = 2  
-    while True:
-        ret, frame = video_capture.read()
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        self.capture = cv2.VideoCapture(0)
 
-        face_locations = face_recognition.face_locations(rgb_frame)
-        face_encodings = face_recognition.face_encodings(rgb_frame, face_locations, num_jitters=NUM_JITTERS)
+        self.update_video_feed()
 
-        for face_encoding, face_location in zip(face_encodings, face_locations):
-            match = None
-            for name, info in registered_faces.items():
-                matches = face_recognition.compare_faces(info['encodings'], face_encoding, tolerance=TOLERANCE)
-                if True in matches:
-                    match = name
-                    break
+    def register_new_face(self, face_encoding):
+        name = simpledialog.askstring("New Face Detected", "Enter your name:")
+        if name:
+            details = simpledialog.askstring("Details", "Enter details about yourself:")
+            registered_faces[name] = {"encoding": face_encoding, "details": details}
+            with open("registered_faces.pkl", "wb") as f:
+                pickle.dump(registered_faces, f)
+            messagebox.showinfo("Success", f"New face registered: {name} - {details}")
+        else:
+            messagebox.showwarning("Warning", "Face registration canceled")
 
-            if match:
-                top, right, bottom, left = face_location
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
-                cv2.putText(frame, f"{match}: {registered_faces[match]['details']}", (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
-                print(f"Recognized {match}: {registered_faces[match]['details']}")
+    def update_video_feed(self):
+        ret, frame = self.capture.read()
+        if ret:
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-                if f"{match}: {registered_faces[match]['details']}" not in recognized_faces:
-                    recognized_faces.append(f"{match}: {registered_faces[match]['details']}")
-            else:
-                print("New face detected, registering...")
-                register_new_face(face_encoding)
+            face_locations = face_recognition.face_locations(rgb_frame)
+            face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
-        if len(recognized_faces) > 10:
-            recognized_faces = recognized_faces[-10:]
+            for face_encoding, face_location in zip(face_encodings, face_locations):
+                match = None
+                for name, info in registered_faces.items():
+                    matches = face_recognition.compare_faces([info['encoding']], face_encoding, tolerance=tolerance)
+                    if matches[0]:
+                        match = name
+                        break
 
-        cv2.imshow("Face Recognition", frame)
+                if match:
+                    top, right, bottom, left = face_location
+                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+                    cv2.putText(frame, f"{match} - {registered_faces[match]['details']}", (left, top - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                    self.face_label.config(text=f"Recognized: {match} - {registered_faces[match]['details']}")
+                else:
+                    self.register_new_face(face_encoding)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            img = Image.fromarray(rgb_frame)
+            imgtk = ImageTk.PhotoImage(image=img)
+            self.video_frame.imgtk = imgtk
+            self.video_frame.config(image=imgtk)
 
-    video_capture.release()
-    cv2.destroyAllWindows()
+        self.root.after(10, self.update_video_feed)
 
-def run_flask():
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    def on_closing(self):
+        self.capture.release()
+        self.root.destroy()
 
-flask_thread = threading.Thread(target=run_flask)
-flask_thread.start()
+if __name__ == "__main__":
+    root = Tk()
+    root.geometry("800x600")  
 
-recognize_faces()
+    app = FaceRecognitionApp(root)
+    root.protocol("WM_DELETE_WINDOW", app.on_closing)
+    root.mainloop()
