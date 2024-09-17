@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import simpledialog, messagebox
 from PIL import Image, ImageTk
 
+
 if os.path.exists("registered_faces.pkl"):
     with open("registered_faces.pkl", "rb") as f:
         registered_faces = pickle.load(f)
@@ -20,17 +21,22 @@ class FaceRecognitionApp:
         self.root = root
         self.root.title("Face Recognition App")
 
+
         self.video_frame = Label(self.root)
         self.video_frame.pack(padx=10, pady=10)
+
 
         self.face_label = Label(self.root, text="Face: None", font=("Arial", 14))
         self.face_label.pack(pady=10)
 
+
         self.capture = cv2.VideoCapture(0)
+
 
         self.update_video_feed()
 
     def register_new_face(self, face_encoding):
+        
         name = simpledialog.askstring("New Face Detected", "Enter your name:")
         if name:
             details = simpledialog.askstring("Details", "Enter details about yourself:")
@@ -46,6 +52,7 @@ class FaceRecognitionApp:
         if ret:
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+            
             face_locations = face_recognition.face_locations(rgb_frame)
             face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
@@ -57,25 +64,30 @@ class FaceRecognitionApp:
                         match = name
                         break
 
+               
+                top, right, bottom, left = face_location
+                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)  
                 if match:
-                    top, right, bottom, left = face_location
-                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
                     cv2.putText(frame, f"{match} - {registered_faces[match]['details']}", (left, top - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
                     self.face_label.config(text=f"Recognized: {match} - {registered_faces[match]['details']}")
                 else:
+                    self.face_label.config(text="Face: None")
                     self.register_new_face(face_encoding)
 
-            img = Image.fromarray(rgb_frame)
+           
+            img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             imgtk = ImageTk.PhotoImage(image=img)
             self.video_frame.imgtk = imgtk
             self.video_frame.config(image=imgtk)
 
+        
         self.root.after(10, self.update_video_feed)
 
     def on_closing(self):
         self.capture.release()
         self.root.destroy()
+
 
 if __name__ == "__main__":
     root = Tk()
