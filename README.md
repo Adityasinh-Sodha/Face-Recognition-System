@@ -16,11 +16,13 @@ This project implements a face recognition system using a webcam. It can recogni
 - SQLite (for face data storage)
 
 ## Requirements
+- Windows 10/11 64bit or Linux amd64
 - Python 3.x
 - OpenCV
 - face_recognition
 - Flask
 - SQLite
+- Visual Studio Build Tools https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 ### Installation
 1. Clone the repository:
@@ -28,15 +30,18 @@ This project implements a face recognition system using a webcam. It can recogni
     git clone https://github.com/AdityaSodha/Face-Recognition-System
     cd Face-Recognition-System
     ```
-2. Install required dependencies:
+2. Install Visual Studio Build Tools
+   https://visualstudio.microsoft.com/visual-cpp-build-tools/
+   and download Desktop development with C++ (ONLY FOR WINDOWS USERS)
+   
+3. Install required dependencies:
     ```bash
     pip install opencv-python flask
     pip install opencv-python-headless
     pip install cmake
     pip install face_recognition
-
     ```
-3. Run the face recognition script:
+4. Run the face recognition script:
     ```bash
     python3 FRS.py
     ```
