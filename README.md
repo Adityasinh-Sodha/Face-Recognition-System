@@ -24,8 +24,8 @@ This project implements a face recognition system using a webcam. It can recogni
 - SQLite
 - (FOR WINDOWS ONLY) Visual Studio Build Tools https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
-### Installation
-## Linux
+## Installation
+### Linux
 1. Clone the repository:
     ```bash
     git clone https://github.com/AdityaSodha/Face-Recognition-System
@@ -44,7 +44,7 @@ This project implements a face recognition system using a webcam. It can recogni
     ```bash
     python3 FRS.py
     ```
-## Windows
+### Windows
 1. Install Visual Studio Build Tools
    https://visualstudio.microsoft.com/visual-cpp-build-tools/
    and download *Desktop development with C++* (ONLY FOR WINDOWS 10/11 ONLY)
