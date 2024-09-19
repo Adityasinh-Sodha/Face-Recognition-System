@@ -3,10 +3,9 @@ import face_recognition
 import numpy as np
 import pickle
 import os
-from tkinter import *
-from tkinter import simpledialog, messagebox
+import tkinter as tk
+from tkinter import simpledialog
 from PIL import Image, ImageTk
-
 
 if os.path.exists("registered_faces.pkl"):
     with open("registered_faces.pkl", "rb") as f:
@@ -14,85 +13,102 @@ if os.path.exists("registered_faces.pkl"):
 else:
     registered_faces = {}
 
-tolerance = 0.5  
+def register_new_face(face_encoding):
+    root = tk.Tk()
+    root.withdraw()
 
-class FaceRecognitionApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Face Recognition App")
+    name = simpledialog.askstring("New Face Detected", "Enter your name:")
+    if name is None:  
+        root.destroy()
+        return
 
+    details = simpledialog.askstring("New Face Detected", "Enter additional details:")
+    if details is None: 
+        root.destroy()
+        return
 
-        self.video_frame = Label(self.root)
-        self.video_frame.pack(padx=10, pady=10)
+    subject = simpledialog.askstring("New Face Detected", "Enter the subject:")
+    if subject is None:  
+        root.destroy()
+        return
 
+    standard = simpledialog.askstring("New Face Detected", "Enter the standard:")
+    if standard is None:  
+        root.destroy()
+        return
 
-        self.face_label = Label(self.root, text="Face: None", font=("Arial", 14))
-        self.face_label.pack(pady=10)
+   
+    registered_faces[name] = {
+        "encoding": face_encoding,
+        "details": details if details else "N/A",
+        "subject": subject if subject else "N/A",
+        "standard": standard if standard else "N/A"
+    }
+    
+    with open("registered_faces.pkl", "wb") as f:
+        pickle.dump(registered_faces, f)
+    
+    root.destroy()
 
+def main():
+   
+    capture = cv2.VideoCapture(0)
 
-        self.capture = cv2.VideoCapture(0)
+    root = tk.Tk()
+    root.title("Face Recognition System")
 
+    video_label = tk.Label(root)
+    video_label.pack()
 
-        self.update_video_feed()
+    face_label = tk.Label(root, text="Face: None", font=('Helvetica', 14))
+    face_label.pack()
 
-    def register_new_face(self, face_encoding):
-        
-        name = simpledialog.askstring("New Face Detected", "Enter your name:")
-        if name:
-            details = simpledialog.askstring("Details", "Enter details about yourself:")
-            registered_faces[name] = {"encoding": face_encoding, "details": details}
-            with open("registered_faces.pkl", "wb") as f:
-                pickle.dump(registered_faces, f)
-            messagebox.showinfo("Success", f"New face registered: {name} - {details}")
-        else:
-            messagebox.showwarning("Warning", "Face registration canceled")
+    details_box = tk.Text(root, height=5, width=50, font=('Helvetica', 14))
+    details_box.pack()
 
-    def update_video_feed(self):
-        ret, frame = self.capture.read()
+    def update_frame():
+        ret, frame = capture.read()
         if ret:
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            
             face_locations = face_recognition.face_locations(rgb_frame)
             face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
             for face_encoding, face_location in zip(face_encodings, face_locations):
                 match = None
                 for name, info in registered_faces.items():
-                    matches = face_recognition.compare_faces([info['encoding']], face_encoding, tolerance=tolerance)
+                    matches = face_recognition.compare_faces([info['encoding']], face_encoding, tolerance=0.5)
                     if matches[0]:
                         match = name
                         break
 
-               
                 top, right, bottom, left = face_location
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)  
                 if match:
-                    cv2.putText(frame, f"{match} - {registered_faces[match]['details']}", (left, top - 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-                    self.face_label.config(text=f"Recognized: {match} - {registered_faces[match]['details']}")
-                else:
-                    self.face_label.config(text="Face: None")
-                    self.register_new_face(face_encoding)
+                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+                    face_label.config(text=f"Recognized: {match}")
 
-           
+                    details_box.delete('1.0', tk.END)
+                    details_box.insert(tk.END, f"Details: {registered_faces[match].get('details', 'N/A')}\n")
+                    details_box.insert(tk.END, f"Subject: {registered_faces[match].get('subject', 'N/A')}\n")
+                    details_box.insert(tk.END, f"Standard: {registered_faces[match].get('standard', 'N/A')}")
+
+                else:
+                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+                    register_new_face(face_encoding)
+
             img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             imgtk = ImageTk.PhotoImage(image=img)
-            self.video_frame.imgtk = imgtk
-            self.video_frame.config(image=imgtk)
 
-        
-        self.root.after(10, self.update_video_feed)
+            video_label.config(image=imgtk)
+            video_label.image = imgtk
 
-    def on_closing(self):
-        self.capture.release()
-        self.root.destroy()
+        video_label.after(10, update_frame)
 
+    update_frame()
 
-if __name__ == "__main__":
-    root = Tk()
-    root.geometry("800x600")  
-
-    app = FaceRecognitionApp(root)
-    root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
+
+    capture.release()
+
+if __name__ == '__main__':
+    main()
