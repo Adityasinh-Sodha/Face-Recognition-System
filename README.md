@@ -47,7 +47,7 @@ This project implements a face recognition system using a webcam. It can recogni
 ### Windows
 1. Install Visual Studio Build Tools
    https://visualstudio.microsoft.com/visual-cpp-build-tools/
-   and download *Desktop development with C++* (ONLY FOR WINDOWS 10/11 ONLY)
+   and download **Desktop development with C++** (ONLY FOR WINDOWS 10/11 ONLY)
 
 2. Install python https://www.python.org/downloads/windows/
    and confiure pip
