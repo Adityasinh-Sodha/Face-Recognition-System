@@ -28,7 +28,7 @@ This project implements a face recognition system using a webcam. It can recogni
 ### Linux
 1. Clone the repository:
     ```bash
-    git clone https://github.com/AdityaSodha/Face-Recognition-System
+    git clone https://github.com/Adityasinh-Sodha/Face-Recognition-System
     cd Face-Recognition-System
     ```   
 2. Install required dependencies:
