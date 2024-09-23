@@ -13,45 +13,56 @@ if os.path.exists("registered_faces.pkl"):
 else:
     registered_faces = {}
 
+temp_face_encoding = None
+
+def capture_new_face():
+    """Called when the user clicks the 'Capture Face' button to store a new face."""
+    global temp_face_encoding
+    if temp_face_encoding is not None:
+        register_new_face(temp_face_encoding)
+        temp_face_encoding = None  
+    else:
+        print("No new face detected to capture!")
+
 def register_new_face(face_encoding):
     root = tk.Tk()
     root.withdraw()
 
     name = simpledialog.askstring("New Face Detected", "Enter your name:")
-    if name is None:  
+    if name is None:
         root.destroy()
         return
 
     details = simpledialog.askstring("New Face Detected", "Enter additional details:")
-    if details is None: 
+    if details is None:
         root.destroy()
         return
 
     subject = simpledialog.askstring("New Face Detected", "Enter the subject:")
-    if subject is None:  
+    if subject is None:
         root.destroy()
         return
 
     standard = simpledialog.askstring("New Face Detected", "Enter the standard:")
-    if standard is None:  
+    if standard is None:
         root.destroy()
         return
 
-   
     registered_faces[name] = {
         "encoding": face_encoding,
         "details": details if details else "N/A",
         "subject": subject if subject else "N/A",
         "standard": standard if standard else "N/A"
     }
-    
+
     with open("registered_faces.pkl", "wb") as f:
         pickle.dump(registered_faces, f)
-    
+
     root.destroy()
 
 def main():
-   
+    global temp_face_encoding
+
     capture = cv2.VideoCapture(0)
 
     root = tk.Tk()
@@ -66,7 +77,11 @@ def main():
     details_box = tk.Text(root, height=5, width=50, font=('Helvetica', 14))
     details_box.pack()
 
+    capture_button = tk.Button(root, text="Capture Face", command=capture_new_face, font=('Helvetica', 14))
+    capture_button.pack(pady=10)
+
     def update_frame():
+        global temp_face_encoding
         ret, frame = capture.read()
         if ret:
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -91,10 +106,11 @@ def main():
                     details_box.insert(tk.END, f"Details: {registered_faces[match].get('details', 'N/A')}\n")
                     details_box.insert(tk.END, f"Subject: {registered_faces[match].get('subject', 'N/A')}\n")
                     details_box.insert(tk.END, f"Standard: {registered_faces[match].get('standard', 'N/A')}")
-
                 else:
                     cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-                    register_new_face(face_encoding)
+                    face_label.config(text="New Face Detected: Capture it?")
+                    
+                    temp_face_encoding = face_encoding
 
             img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             imgtk = ImageTk.PhotoImage(image=img)
