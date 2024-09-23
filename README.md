@@ -42,7 +42,7 @@ This project implements a face recognition system using a webcam. It can recogni
     ```
 3. Run the face recognition script:
     ```bash
-    python3 FRS.py
+    python3 main.py
     ```
 ### Windows
 1. Install Visual Studio Build Tools
@@ -61,7 +61,7 @@ This project implements a face recognition system using a webcam. It can recogni
     pip install pillow
 
     ```
-4. python FRS.py
+4. python main.py
 5. Ragister your face
 
 ### How It Works
