@@ -17,11 +17,7 @@ This project implements a face recognition system using a webcam. It can recogni
 
 ## Requirements
 - Windows 10/11 64bit or Linux amd64
-- Python 3.x
-- OpenCV
-- face_recognition
-- Flask
-- SQLite
+- Python 3.11
 - (FOR WINDOWS ONLY) Visual Studio Build Tools https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 ## Installation
