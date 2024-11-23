@@ -57,8 +57,9 @@ This project implements a face recognition system using a webcam. It can recogni
     pip install pillow
 
     ```
-4. python main.py
-5. Ragister your face
+4. Run the command ```
+   python main.py```
+6. Ragister your face and enjoy.
 
 ### How It Works
 - The script starts webcam-based face recognition using OpenCV.
