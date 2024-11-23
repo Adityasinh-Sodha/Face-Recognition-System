@@ -31,6 +31,7 @@ This project implements a face recognition system using a webcam. It can recogni
     ```bash
     pip install opencv-python flask
     pip install opencv-python-headless
+    sudo apt install libgl1-mesa-glx
     pip install cmake
     pip install face_recognition
     pip install pillow
