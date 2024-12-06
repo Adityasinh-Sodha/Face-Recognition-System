@@ -1,5 +1,5 @@
 # Face-Recognition-System
-This is a basic Face recognition system by Adityasinh Sodha 
+This is a advance Face recognition system by Adityasinh Sodha 
 
 ## Overview
 This project implements a face recognition system using a webcam. It can recognize registered faces and display their details, while prompting for input when a new face is detected.
