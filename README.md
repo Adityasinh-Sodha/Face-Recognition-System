@@ -18,7 +18,7 @@ This project implements a face recognition system using a webcam. It can recogni
 ## Requirements
 - Windows 10/11 64bit or Linux amd64
 - Python 3.11
-- (FOR WINDOWS ONLY) Visual Studio Build Tools https://visualstudio.microsoft.com/visual-cpp-build-tools/
+-  [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (FOR WINDOWS ONLY)
 
 ## Installation
 ### Linux
@@ -42,11 +42,10 @@ This project implements a face recognition system using a webcam. It can recogni
     python3 main.py
     ```
 ### Windows
-1. Install Visual Studio Build Tools
-   https://visualstudio.microsoft.com/visual-cpp-build-tools/
+1. Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
    and download **Desktop development with C++** (ONLY FOR WINDOWS 10/11)
 
-2. Install python https://www.python.org/downloads/windows/
+2. Install [python](https://www.python.org/downloads/windows/)
    and confiure pip
 
 3. Open cmd and install required dependencies:
