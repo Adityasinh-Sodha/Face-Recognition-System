@@ -72,3 +72,5 @@ Feel free to fork the repository and make improvements. Contributions are welcom
 
 ## License
 This project is licensed under the MIT License.
+## Author
+Developed by **Adityasinh**.
