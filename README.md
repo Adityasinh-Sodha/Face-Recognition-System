@@ -16,6 +16,7 @@ This project implements a face recognition system using a webcam. It can recogni
 - SQLite (for face data storage)
 
 ## Requirements
+- Use requirements.txt to download all library
 - Windows 10/11 64bit or Linux amd64
 - Python 3.11
 -  [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (FOR WINDOWS ONLY)
