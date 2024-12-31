@@ -29,7 +29,7 @@ jobs:
         run: |
           git remote add gitlab https://Adityasinh-Sodha:$GITLAB_TOKEN@gitlab.com/Adityasinh-Sodha/Face-Recognition-System.git
           git fetch gitlab main
-          git rebase gitlab/main || git rebase --skip
+          git rebase --strategy=recursive --strategy-option=theirs gitlab/main || git rebase --skip
 
       - name: Push to GitLab
         env:
