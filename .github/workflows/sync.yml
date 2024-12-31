@@ -15,6 +15,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set Git Config (User Identity)
+        run: |
+          git config --global user.email "Work.adityasodha@gmail.com"
+          git config --global user.name "Adityasinh-Sodha"
+
       - name: Unshallow Clone (if needed)
         run: |
           if [ -f .git/shallow ]; then
@@ -27,7 +32,7 @@ jobs:
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB }}
         run: |
-          git remote add gitlab https://Adityasinh-Sodha:$GITLAB_TOKEN@gitlab.com/Adityasinh-Sodha/Face-Recognition-System.git
+          git remote add gitlab https://Adityasinh-Sodha:$GITLAB_TOKEN@gitlab.com/Adityasinh-Sodha/MaxEdit.git
           git fetch gitlab main
           git rebase --strategy=recursive --strategy-option=theirs gitlab/main || git rebase --skip
 
